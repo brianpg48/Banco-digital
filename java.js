@@ -1,58 +1,116 @@
-class conta {
-    _saldo;
-    constructor(titular, numeroConta) {
+const prompt = require('prompt-sync')();
+
+class Conta {
+    constructor(titular, numeroConta, senha) {
         this.titular = titular;
         this._saldo = 0;
-        this.numeroConta = numeroConta
+        this.numeroConta = numeroConta || Math.floor(Math.random() * 10000);
+        this._senha = senha;
     }
+
+    login(senhaDigitada) {
+        if (senhaDigitada == this._senha) {
+            console.log("Login realizado com sucesso");
+            return true;
+        } else {
+            console.log("Senha incorreta");
+            return false;
+        }
+    }
+
     depositar(valor) {
-        if (valor > 0) this._saldo += valor;
+        if (valor > 0) {
+            this._saldo += valor;
+        }
     }
 
     sacar(valor) {
-        if (valor <= this._saldo) this._saldo -= valor;
-        else console.log("Saldo insuficiente");
-
+        if (valor <= this._saldo) {
+            this._saldo -= valor;
+        } else {
+            console.log("Saldo insuficiente");
+        }
     }
+
     consultarSaldo() {
         return this._saldo;
- }
+    }
 }
-class contaCorrente extends conta {
-    constructor(titular, numeroConta) {
-        super(titular, numeroConta);
+
+class ContaCorrente extends Conta {
+    constructor(titular, numeroConta, senha) {
+        super(titular, numeroConta, senha);
         this.limite = 500;
     }
-    depositar(valor) {
-        if (valor > 0) this._saldo += valor;
-    }
 
     sacar(valor) {
-        if (valor <= this._saldo + this.limite) this._saldo -= valor;
-        else console.log("Saldo insuficiente");
+        if (valor <= this._saldo + this.limite) {
+            this._saldo -= valor;
+        } else {
+            console.log("Saldo insuficiente (mesmo com limite)");
+        }
     }
 }
 
-class contaPoupanca extends conta {
-    constructor(titular, numeroConta) {
-        super(titular, numeroConta);
-        this.limite = 0;
+class ContaPoupanca extends Conta {
+    constructor(titular, numeroConta, senha) {
+        super(titular, numeroConta, senha);
     }
+
     aplicarRendimentos() {
-        this.depositar(this._saldo * 0.05)
+        this.depositar(this._saldo * 0.05);
     }
-    sacar(valor) {
-        if (valor <= this._saldo - this.limite) this._saldo -= valor;
-        else console.log("Saldo insuficiente");
-    }
+}
 
-}
-const conta1 = new contaPoupanca("Lucas", 123456); {
-    conta1.depositar(1000);
+const conta1 = new ContaPoupanca("Lucas", 123456, 123);
+const conta2 = new ContaCorrente("Fábio", 654321, 456);
+
+let senhaDigitada = prompt("Digite a senha para acessar a conta: ");
+if (conta1.login(senhaDigitada)) {
     conta1.aplicarRendimentos();
-    console.log(`Saldo R$ ${conta1.consultarSaldo().toFixed(2)}`);
+
+    while (true) {
+        console.log("\n1 - Depositar\n2 - Sacar\n3 - Consultar Saldo\n4 - Sair");
+        let opcao = prompt("Escolha uma opção: ");
+
+        if (opcao == "1") {
+            let valor = parseFloat(prompt("Digite o valor a ser depositado: "));
+            conta1.depositar(valor);
+        } else if (opcao == "2") {
+            let valor = parseFloat(prompt("Digite o valor a ser sacado: "));
+            conta1.sacar(valor);
+        } else if (opcao == "3") {
+            console.log(`Saldo atual: R$ ${conta1.consultarSaldo().toFixed(2)}`);
+        } else if (opcao == "4") {
+            console.log("Encerrando o sistema...");
+            break;
+        } else {
+            console.log("Opção inválida");
+        }
+    }
+} else {
+    console.log("Não foi possível acessar a conta.");
 }
-const conta2 = new contaCorrente("Luis", 654321); {
-    conta2.depositar(1000);
-    console.log(`Saldo R$ ${conta2.consultarSaldo().toFixed(2)}`);
+if (conta2.login(senhaDigitada)) {
+    while (true) {
+        console.log("\n1 - Depositar\n2 - Sacar\n3 - Consultar Saldo\n4 - Sair");
+        let opcao = prompt("Escolha uma opção: ");
+
+        if (opcao == "1") {
+            let valor = parseFloat(prompt("Digite o valor a ser depositado: "));
+            conta1.depositar(valor);
+        } else if (opcao == "2") {
+            let valor = parseFloat(prompt("Digite o valor a ser sacado: "));
+            conta1.sacar(valor);
+        } else if (opcao == "3") {
+            console.log(`Saldo atual: R$ ${conta1.consultarSaldo().toFixed(2)}`);
+        } else if (opcao == "4") {
+            console.log("Encerrando o sistema...");
+            break;
+        } else {
+            console.log("Opção inválida");
+        }
+    }
+} else {
+    console.log("Não foi possível acessar a conta.");
 }
